@@ -1,16 +1,18 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthDosenController;
+use App\Http\Controllers\DosenDashboardController;
 
-Route::get('/register-dosen', [AuthDosenController::class, 'register'])->name('dosen.register');
+Route::get('/dosen/register', [AuthDosenController::class, 'register'])->name('dosen.register');
+Route::post('/dosen/register', [AuthDosenController::class, 'registerStore'])->name('dosen.register.store');
 
-Route::post('/register-dosen', [AuthDosenController::class, 'registerStore'])->name('dosen.register.store');
+Route::get('/dosen/login', [AuthDosenController::class, 'login'])->name('dosen.login');
+Route::post('/dosen/login', [AuthDosenController::class, 'loginStore'])->name('dosen.login.store');
 
-Route::get('/', function () {
-    return view('welcome');
+Route::middleware(['dosen'])->group(function () {
+    Route::get('/dosen/dashboard', [AuthDosenController::class, 'dashboard'])
+        ->name('dosen.dashboard');
+
+    Route::post('/dosen/logout', [AuthDosenController::class, 'logout'])->name('dosen.logout');
 });
 
-Route::get('/tes', function () {
-    return "BERHASIL";
-});

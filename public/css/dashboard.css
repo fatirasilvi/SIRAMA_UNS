@@ -1,0 +1,71 @@
+body {
+    background: #f5f6fa;
+    font-family: Poppins, sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 240px;
+    height: 100vh;
+    background: #0F3D91;
+    color: white;
+    padding: 25px;
+    position: fixed;
+}
+
+.sidebar a {
+    display: block;
+    padding: 10px 0;
+    margin-top: 8px;
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.sidebar a:hover {
+    opacity: 0.8;
+}
+
+.logout-btn {
+    margin-top: 20px;
+    width: 100%;
+    border: none;
+    padding: 10px;
+    background: #d9534f;
+    color: white;
+    border-radius: 5px;
+}
+
+/* Content area */
+.content {
+    margin-left: 240px;
+    padding: 20px;
+}
+
+.topbar {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+/* Profil, stats, etc. */
+.profile-box {
+    background: #1e54d3;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.stats {
+    display: flex;
+    margin-top: 20px;
+    gap: 20px;
+}
+
+.stat {
+    background: white;
+    padding: 20px;
+    width: 31%;
+    border-radius: 10px;
+}
