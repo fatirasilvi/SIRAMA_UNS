@@ -74,19 +74,19 @@
 
             <h3 class="fw-bold mb-4" style="color:#2349C6;">Login</h3>
 
-            <form action="#" method="POST">
+            <form action="{{ route('dosen.login.store') }}" method="POST">
                 @csrf
 
                 <!-- NIP -->
                 <div class="mb-3 input-group-custom">
                     <i class="bi bi-person"></i>
-                    <input type="text" class="form-control" placeholder="NIP">
+                    <input type="text" name="nip" class="form-control" placeholder="NIP" required>
                 </div>
 
                 <!-- PASSWORD -->
                 <div class="mb-3 input-group-custom">
                     <i class="bi bi-lock"></i>
-                    <input type="password" class="form-control" placeholder="Password">
+                    <input type="password" name="password" class="form-control" placeholder="Password" required>
                 </div>
 
                 <button class="btn btn-login mt-2">Login</button>

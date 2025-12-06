@@ -1,0 +1,43 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up()
+{
+    Schema::create('penelitians', function (Blueprint $table) {
+        $table->id();
+        $table->unsignedBigInteger('dosen_id');   // hanya sekali
+        $table->string('judul');
+        $table->string('bidang');
+        $table->integer('tahun');
+        $table->text('abstrak')->nullable();
+        $table->string('file_path')->nullable();
+        $table->enum('status', ['Menunggu Validasi', 'Disetujui', 'Ditolak'])
+              ->default('Menunggu Validasi');
+        $table->timestamps();
+
+        // Foreign Key yang BENAR
+        $table->foreign('dosen_id')
+              ->references('id')
+              ->on('dosen')
+              ->onDelete('cascade');
+    });
+}
+
+
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('penelitians');
+    }
+};

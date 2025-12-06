@@ -99,7 +99,7 @@
                 @endif
 
                 <!-- FORM -->
-                <form action="{{  route('dosen.register.store') }}" method="POST">
+                <form action="{{  route('dosen.register.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     <!-- NAME -->

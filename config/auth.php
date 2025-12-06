@@ -15,7 +15,7 @@ return [
 
         'dosen' => [
             'driver' => 'session',
-            'provider' => 'dosens',
+            'provider' => 'dosen',
         ],
     ],
 
