@@ -14,6 +14,7 @@
     <style>
         body {
             background: #f5f7fb;
+            margin: 0;
         }
 
         /* SIDEBAR */
@@ -23,7 +24,10 @@
             background: #0c2f75;
             color: white;
             position: fixed;
+            top: 0;
+            left: 0;
             padding: 25px 20px;
+            z-index: 1000;
         }
 
         .sidebar-header {
@@ -60,7 +64,7 @@
 
         /* CONTENT */
         .content {
-            margin-left: 250px;
+            margin-left: 250px; /* ✅ INI KUNCI UTAMA POSISI SAMPING */
             padding: 25px;
         }
 
@@ -80,7 +84,7 @@
             margin-bottom: 20px;
         }
 
-        /* STATIK */
+        /* STAT */
         .stat {
             color: white;
             padding: 25px;
@@ -99,17 +103,20 @@
         .stat-green { background: #27ae60; }
         .stat-blue { background: #2980b9; }
         .stat-orange { background: #e67e22; }
-
     </style>
-
 </head>
 <body>
 
-    @include('partials.sidebar')
+    {{-- SIDEBAR --}}
+    @if(request()->is('admin*'))
+        @include('partials.sidebar-admin')
+    @else
+        @include('partials.sidebar')
+    @endif
 
     <div class="content">
 
-        <!-- Topbar -->
+        <!-- ✅ TOPBAR OTOMATIS ADMIN / DOSEN -->
         <div class="topbar d-flex justify-content-between align-items-center">
             <h4 class="m-0">
                 <i class="bi bi-speedometer2 me-2"></i>
@@ -117,19 +124,26 @@
             </h4>
 
             <div class="text-end">
-                <strong>{{ auth()->user()->name }}</strong><br>
-                <span>{{ auth()->user()->nip }}</span>
+                @if(request()->is('admin*'))
+                    <strong>{{ auth()->guard('admin')->user()->nama ?? 'Admin' }}</strong><br>
+                    <span>Administrator</span>
+                @else
+                    <strong>{{ auth()->guard('dosen')->user()->nama }}</strong><br>
+                    <span>{{ auth()->guard('dosen')->user()->nip }}</span>
+                @endif
             </div>
         </div>
 
+        <!-- Content dari child view -->
         @yield('content')
-        @if(session('success'))
-<div class="alert alert-success mt-2">
-    {{ session('success') }}
-</div>
-@endif
 
     </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Sweet Alert 2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </body>
 </html>

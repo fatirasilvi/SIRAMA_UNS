@@ -17,6 +17,11 @@ return [
             'driver' => 'session',
             'provider' => 'dosen',
         ],
+
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'admins',
+        ],
     ],
 
     'providers' => [
@@ -28,6 +33,11 @@ return [
         'dosen' => [
             'driver' => 'eloquent',
             'model' => App\Models\Dosen::class,
+        ],
+
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin::class,
         ],
     ],
 

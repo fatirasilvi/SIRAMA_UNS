@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Penelitian extends Model
+class Pengabdian extends Model
 {
     protected $fillable = [
         'dosen_id',
@@ -29,15 +29,13 @@ class Penelitian extends Model
         return $this->belongsTo(Bidang::class, 'bidang_id');
     }
 
-    // Accessor untuk mendapatkan nama bidang
+    // Accessor nama bidang (sama seperti Penelitian)
     public function getBidangAttribute()
     {
-        // Jika ada bidang_id, ambil dari relasi
         if ($this->bidang_id && $this->bidangRelation) {
             return $this->bidangRelation->nama_bidang;
         }
-        
-        // Fallback ke kolom bidang lama
+
         return $this->attributes['bidang'] ?? '-';
     }
 }

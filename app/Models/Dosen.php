@@ -26,4 +26,9 @@ class Dosen extends Authenticatable
     {
         return $this->hasMany(Penelitian::class, 'dosen_id', 'id');
     }
+
+    public function pengabdians()
+{
+    return $this->hasMany(Pengabdian::class);
+}
 }

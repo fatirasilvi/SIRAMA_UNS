@@ -46,27 +46,46 @@ class AuthDosenController extends Controller
     }
 
     public function loginStore(Request $request)
-    {
-        $request->validate([
-            'nip' => 'required|string',
-            'password' => 'required',
-        ]);
+{
+    $request->validate([
+        'nip' => 'required',
+        'password' => 'required',
+    ]);
 
-        $credentials = [
-            'nip' => $request->nip,
-            'password' => $request->password,
-        ];
+    // ✅ COBA LOGIN SEBAGAI DOSEN
+    if (Auth::guard('dosen')->attempt([
+        'nip' => $request->nip,
+        'password' => $request->password,
+    ])) {
 
-        if (Auth::guard('dosen')->attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect()->route('dosen.dashboard');
+        $request->session()->regenerate();
+
+        // ✅ CEK STATUS AKTIF DOSEN DI SINI (INI YANG KAMU TANYAKAN!)
+        $dosen = Auth::guard('dosen')->user();
+
+        if (!$dosen->is_active) {
+            Auth::guard('dosen')->logout();
+            return back()->with('error', 'Akun Anda telah dinonaktifkan oleh admin.');
         }
 
-        return back()->withErrors([
-            'nip' => 'NIP atau password salah.',
-        ])->onlyInput('nip');
+        return redirect()->route('dosen.dashboard');
     }
 
+    // ✅ COBA LOGIN SEBAGAI ADMIN
+    if (Auth::guard('admin')->attempt([
+        'nip' => $request->nip,
+        'password' => $request->password,
+    ])) {
+
+        $request->session()->regenerate();
+        return redirect()->route('admin.dashboard');
+    }
+
+    // ❌ JIKA GAGAL SEMUA
+    return back()->withErrors([
+        'nip' => 'NIP atau Password salah',
+    ]);
+}
 
     /* ===============================
        LOGOUT
@@ -84,15 +103,6 @@ class AuthDosenController extends Controller
     /* ===============================
        DASHBOARD
     ================================ */
-    public function dashboard()
-    {
-        return view('dosen.index', [
-            'totalPenelitian' => 0,
-            'totalPengabdian' => 0,
-            'menungguValidasi' => 0,
-            'aktivitas' => []
-        ]);
-    }
 
 
     /* ===============================

@@ -5,10 +5,10 @@
 <div class="container-fluid">
 
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="fw-bold">Kelola Penelitian Anda</h4>
+        <h4 class="fw-bold">Kelola Pengabdian Anda</h4>
 
-        <a href="{{ route('dosen.penelitian.create') }}" class="btn btn-success px-4">
-            <i class="bi bi-plus-circle"></i> Tambah Penelitian
+        <a href="{{ route('dosen.pengabdian.create') }}" class="btn btn-primary px-4">
+            <i class="bi bi-plus-circle"></i> Tambah Pengabdian
         </a>
     </div>
 
@@ -29,14 +29,16 @@
                 </div>
 
                 <div class="col-md-3">
-    <label class="fw-semibold mb-1">Bidang</label>
-    <select class="form-select" id="filterBidang">
-        <option value="">Semua Bidang</option>
-        @foreach($bidangList as $bidang)
-            <option value="{{ $bidang->nama_bidang }}">{{ $bidang->nama_bidang }}</option>
-        @endforeach
-    </select>
-</div>
+                    <label class="fw-semibold mb-1">Bidang</label>
+                    <select class="form-select" id="filterBidang">
+                        <option value="">Semua Bidang</option>
+                        @foreach($bidangList as $bidang)
+                            <option value="{{ $bidang->nama_bidang }}">
+                                {{ $bidang->nama_bidang }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
                 <div class="col-md-3">
                     <label class="fw-semibold mb-1">Status</label>
@@ -62,7 +64,7 @@
     <div class="card shadow-sm border-0">
         <div class="card-body">
 
-            @if($penelitian->count() > 0)
+            @if($pengabdian->count() > 0)
                 <table class="table table-hover align-middle">
 
                     <thead>
@@ -77,7 +79,7 @@
                     </thead>
 
                     <tbody id="tableBody">
-                        @foreach ($penelitian as $index => $p)
+                        @foreach ($pengabdian as $index => $p)
                             <tr data-tahun="{{ $p->tahun }}" 
                                 data-bidang="{{ $p->bidang }}" 
                                 data-status="{{ $p->status }}" 
@@ -86,7 +88,7 @@
                                 <td>{{ $index + 1 }}</td>
 
                                 <td style="max-width: 350px;">
-                                    <a href="{{ route('dosen.penelitian.show', $p->id) }}" 
+                                    <a href="{{ route('dosen.pengabdian.show', $p->id) }}" 
                                        class="fw-semibold text-decoration-none text-dark">
                                         {{ $p->judul }}
                                     </a>
@@ -113,8 +115,9 @@
 
                                 <td class="text-center">
                                     <div class="btn-group" role="group">
+
                                         {{-- DETAIL --}}
-                                        <a href="{{ route('dosen.penelitian.show', $p->id) }}" 
+                                        <a href="{{ route('dosen.pengabdian.show', $p->id) }}" 
                                            class="btn btn-sm btn-outline-primary"
                                            data-bs-toggle="tooltip" 
                                            title="Lihat Detail">
@@ -122,7 +125,7 @@
                                         </a>
 
                                         {{-- EDIT --}}
-                                        <a href="{{ route('dosen.penelitian.edit', $p->id) }}" 
+                                        <a href="{{ route('dosen.pengabdian.edit', $p->id) }}" 
                                            class="btn btn-sm btn-outline-success"
                                            data-bs-toggle="tooltip" 
                                            title="Edit">
@@ -130,7 +133,7 @@
                                         </a>
 
                                         {{-- DELETE --}}
-                                        <form action="{{ route('dosen.penelitian.destroy', $p->id) }}"
+                                        <form action="{{ route('dosen.pengabdian.destroy', $p->id) }}"
                                               method="POST" 
                                               class="d-inline delete-form">
                                             @csrf
@@ -144,6 +147,7 @@
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
+
                                     </div>
                                 </td>
                             </tr>
@@ -160,9 +164,9 @@
             @else
                 <div class="text-center text-muted py-5">
                     <i class="bi bi-folder2-open fs-1"></i>
-                    <p class="mt-3">Belum ada penelitian yang diajukan.</p>
-                    <a href="{{ route('dosen.penelitian.create') }}" class="btn btn-primary mt-2">
-                        <i class="bi bi-plus-circle"></i> Tambah Penelitian Pertama
+                    <p class="mt-3">Belum ada pengabdian yang diajukan.</p>
+                    <a href="{{ route('dosen.pengabdian.create') }}" class="btn btn-primary mt-2">
+                        <i class="bi bi-plus-circle"></i> Tambah Pengabdian Pertama
                     </a>
                 </div>
             @endif
@@ -172,8 +176,8 @@
 
 </div>
 
+{{-- SCRIPT FILTER + SWEETALERT SAMA PERSIS --}}
 <script>
-// Konfirmasi delete dengan Sweet Alert
 document.querySelectorAll('.delete-button').forEach(button => {
     button.addEventListener('click', function(e) {
         e.preventDefault();
@@ -182,8 +186,8 @@ document.querySelectorAll('.delete-button').forEach(button => {
         const judul = this.getAttribute('data-judul');
         
         Swal.fire({
-            title: 'Hapus Penelitian?',
-            html: `Apakah Anda yakin ingin menghapus penelitian:<br><strong>"${judul}"</strong>?<br><br><small class="text-danger">Data yang dihapus tidak dapat dikembalikan!</small>`,
+            title: 'Hapus Pengabdian?',
+            html: `Apakah Anda yakin ingin menghapus pengabdian:<br><strong>"${judul}"</strong>?<br><br><small class="text-danger">Data yang dihapus tidak dapat dikembalikan!</small>`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
@@ -193,7 +197,6 @@ document.querySelectorAll('.delete-button').forEach(button => {
             reverseButtons: true,
         }).then((result) => {
             if (result.isConfirmed) {
-                // Tampilkan loading
                 Swal.fire({
                     title: 'Menghapus...',
                     text: 'Mohon tunggu sebentar',
@@ -203,15 +206,12 @@ document.querySelectorAll('.delete-button').forEach(button => {
                         Swal.showLoading();
                     }
                 });
-                
-                // Submit form
                 form.submit();
             }
         });
     });
 });
 
-// Filter functionality
 const searchInput = document.getElementById('searchInput');
 const filterTahun = document.getElementById('filterTahun');
 const filterBidang = document.getElementById('filterBidang');
@@ -246,31 +246,19 @@ function filterTable() {
         }
     });
     
-    // Show/hide "no results" message
-    if (tableBody && noResults) {
-        if (visibleCount === 0) {
-            tableBody.parentElement.style.display = 'none';
-            noResults.style.display = 'block';
-        } else {
-            tableBody.parentElement.style.display = '';
-            noResults.style.display = 'none';
-        }
+    if (visibleCount === 0) {
+        tableBody.parentElement.style.display = 'none';
+        noResults.style.display = 'block';
+    } else {
+        tableBody.parentElement.style.display = '';
+        noResults.style.display = 'none';
     }
 }
 
-// Attach event listeners
 searchInput?.addEventListener('keyup', filterTable);
 filterTahun?.addEventListener('change', filterTable);
 filterBidang?.addEventListener('change', filterTable);
 filterStatus?.addEventListener('change', filterTable);
-
-// Initialize Bootstrap tooltips
-document.addEventListener('DOMContentLoaded', function() {
-    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-});
 </script>
 
 @endsection

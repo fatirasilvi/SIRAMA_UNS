@@ -2,20 +2,103 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DosenDashboardController extends Controller
 {
     public function index()
-{
-    $user = auth()->user();
+    {
+        $dosen = Auth::guard('dosen')->user();
 
-    return view('dashboard.index', [
-        'totalPenelitian' => $user->penelitian()->count(),
-        'totalPengabdian' => $user->pengabdian()->count(),
-        'menungguValidasi' => $user->aktivitas()->where('status','menunggu')->count(),
-        'aktivitas' => $user->aktivitas()->latest()->take(5)->get()
-    ]);
-}
+        // Hitung total penelitian
+        $totalPenelitian = DB::table('penelitians')
+                            ->where('dosen_id', $dosen->id)
+                            ->count();
 
+        // Hitung total pengabdian (jika tabel sudah ada)
+        $totalPengabdian = DB::table('pengabdians')
+                            ->where('dosen_id', $dosen->id)
+                            ->count();
+
+        // Hitung menunggu validasi
+        $menungguValidasiPenelitian = DB::table('penelitians')
+                                        ->where('dosen_id', $dosen->id)
+                                        ->where('status', 'Menunggu Validasi')
+                                        ->count();
+
+        $menungguValidasiPengabdian = DB::table('pengabdians')
+                                        ->where('dosen_id', $dosen->id)
+                                        ->where('status', 'Menunggu Validasi')
+                                        ->count();
+
+        $menungguValidasi = $menungguValidasiPenelitian + $menungguValidasiPengabdian;
+
+        // Ambil aktivitas terbaru (10 terakhir)
+        $penelitianList = DB::table('penelitians')
+                            ->select(
+                                'id',
+                                'judul',
+                                'bidang',
+                                'tahun',
+                                'status',
+                                'created_at'
+                            )
+                            ->where('dosen_id', $dosen->id)
+                            ->orderBy('created_at', 'desc')
+                            ->limit(5)
+                            ->get()
+                            ->map(function($item) {
+                                return [
+                                    'id' => $item->id,
+                                    'judul' => $item->judul,
+                                    'kategori' => $item->bidang ?? '-',
+                                    'tahun' => $item->tahun,
+                                    'jenis' => 'Penelitian',
+                                    'status' => $item->status,
+                                    'created_at' => $item->created_at,
+                                    'route' => route('dosen.penelitian.show', $item->id),
+                                ];
+                            });
+
+        $pengabdianList = DB::table('pengabdians')
+                            ->select(
+                                'id',
+                                'judul',
+                                'bidang',
+                                'tahun',
+                                'status',
+                                'created_at'
+                            )
+                            ->where('dosen_id', $dosen->id)
+                            ->orderBy('created_at', 'desc')
+                            ->limit(5)
+                            ->get()
+                            ->map(function($item) {
+                                return [
+                                    'id' => $item->id,
+                                    'judul' => $item->judul,
+                                    'kategori' => $item->bidang ?? '-',
+                                    'tahun' => $item->tahun,
+                                    'jenis' => 'Pengabdian',
+                                    'status' => $item->status,
+                                    'created_at' => $item->created_at,
+                                    'route' => route('dosen.pengabdian.show', $item->id),
+                                ];
+                            });
+
+        // Gabungkan dan ambil 10 terbaru
+        $aktivitas = collect($penelitianList)
+                        ->concat($pengabdianList)
+                        ->sortByDesc('created_at')
+                        ->take(10)
+                        ->values();
+
+        return view('dosen.index', compact(
+            'totalPenelitian',
+            'totalPengabdian',
+            'menungguValidasi',
+            'aktivitas'
+        ));
+    }
 }
