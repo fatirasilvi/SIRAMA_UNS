@@ -94,11 +94,13 @@ class DosenDashboardController extends Controller
                         ->take(10)
                         ->values();
 
-        return view('dosen.index', compact(
-            'totalPenelitian',
-            'totalPengabdian',
-            'menungguValidasi',
-            'aktivitas'
-        ));
+        return view('dosen.index', [
+    'title' => 'Dashboard Dosen',
+    'totalPenelitian' => $totalPenelitian,
+    'totalPengabdian' => $totalPengabdian,
+    'menungguValidasi' => $menungguValidasi,
+    'aktivitas' => $aktivitas
+]);
+
     }
 }

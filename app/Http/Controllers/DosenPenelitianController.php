@@ -22,7 +22,11 @@ $bidangList = Bidang::where('is_active', true)
                         ->orderBy('nama_bidang')
                         ->get();
 
-    return view('dosen.penelitian.index', compact('penelitian', 'bidangList'));
+    return view('dosen.penelitian.index', [
+    'title' => 'Data Penelitian',
+    'penelitian' => $penelitian,
+    'bidangList' => $bidangList
+]);
     }
 
 

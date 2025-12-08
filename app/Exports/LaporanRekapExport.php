@@ -3,44 +3,49 @@
 namespace App\Exports;
 
 use App\Models\Dosen;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
+use Illuminate\Contracts\View\View;
+use Maatwebsite\Excel\Concerns\FromView;
 
-class LaporanRekapExport implements FromCollection, WithHeadings
+class LaporanRekapExport implements FromView
 {
     protected $tahun;
+    protected $tipe; // penelitian / pengabdian
 
-    public function __construct($tahun)
+    // ✅ INI YANG BARUSAN KITA BAHAS
+    public function __construct($tahun, $tipe)
     {
         $this->tahun = $tahun;
+        $this->tipe  = $tipe;
     }
 
-    public function collection()
+    // ✅ INI TEMPAT IF ($this->tipe === 'penelitian') KAMU TARUH
+    public function view(): View
     {
-        return Dosen::withCount([
-            'penelitians as total_penelitian' => function ($q) {
-                if ($this->tahun) {
-                    $q->where('tahun', $this->tahun);
-                }
-            },
-            'pengabdians as total_pengabdian' => function ($q) {
-                if ($this->tahun) {
-                    $q->where('tahun', $this->tahun);
-                }
-            }
-        ])->get()->map(function ($d) {
-            return [
-                $d->nama,
-                $d->nip,
-                $d->total_penelitian,
-                $d->total_pengabdian,
-                $d->total_penelitian + $d->total_pengabdian
-            ];
-        });
-    }
+        if ($this->tipe === 'penelitian') {
 
-    public function headings(): array
-    {
-        return ['Nama Dosen', 'NIP', 'Total Penelitian', 'Total Pengabdian', 'Total Keseluruhan'];
+            $dosen = Dosen::withCount([
+                'penelitians as total' => function ($q) {
+                    if ($this->tahun) {
+                        $q->where('tahun', $this->tahun);
+                    }
+                }
+            ])->get();
+
+            $judul = 'Laporan Rekap Penelitian';
+
+        } else {
+
+            $dosen = Dosen::withCount([
+                'pengabdians as total' => function ($q) {
+                    if ($this->tahun) {
+                        $q->where('tahun', $this->tahun);
+                    }
+                }
+            ])->get();
+
+            $judul = 'Laporan Rekap Pengabdian';
+        }
+
+        return view('admin.laporan.excel', compact('dosen', 'judul'));
     }
 }

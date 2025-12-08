@@ -140,13 +140,25 @@ Route::prefix('admin')->middleware('auth:admin')->name('admin.')->group(function
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])
         ->name('dashboard');
 
-    // ✅ DATA DOSEN
-    Route::get('/dosen', [AdminDosenController::class, 'index'])
-        ->name('dosen.index');
+  // DATA DOSEN
+Route::get('/dosen', [AdminDosenController::class, 'index'])
+    ->name('dosen.index');
 
-    Route::put('/dosen/{id}/toggle-status', 
-        [AdminDosenController::class, 'toggleStatus']
-    )->name('dosen.toggle-status');
+Route::get('/dosen/create', [AdminDosenController::class, 'create'])
+    ->name('dosen.create');
+
+Route::post('/dosen', [AdminDosenController::class, 'store'])
+    ->name('dosen.store');
+
+Route::get('/dosen/{id}/edit', [AdminDosenController::class, 'edit'])
+    ->name('dosen.edit');
+
+Route::put('/dosen/{id}', [AdminDosenController::class, 'update'])
+    ->name('dosen.update');
+
+Route::put('/dosen/{id}/toggle-status', [AdminDosenController::class, 'toggleStatus'])
+    ->name('dosen.toggle-status');
+
 
 
     // ==========================

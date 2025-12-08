@@ -10,6 +10,7 @@
         <h4 class="m-0 fw-bold">
             Hai, {{ auth()->guard('admin')->user()->nama ?? 'Admin' }}!
         </h4>
+        <p class="m-0">NIP: {{ auth()->guard('admin')->user()->nip }}</p>
         <p class="m-0">Sistem Informasi Riset & Pengabdian</p>
         <small>Universitas Sebelas Maret</small>
     </div>

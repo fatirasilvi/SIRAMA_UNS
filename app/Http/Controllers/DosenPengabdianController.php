@@ -25,7 +25,12 @@ class DosenPengabdianController extends Controller
             ->orderBy('nama_bidang')
             ->get();
 
-        return view('dosen.pengabdian.index', compact('pengabdian', 'bidangList'));
+        return view('dosen.pengabdian.index', [
+    'title' => 'Data Pengabdian',
+    'pengabdian' => $pengabdian,
+    'bidangList' => $bidangList
+]);
+
     }
 
     // ================================

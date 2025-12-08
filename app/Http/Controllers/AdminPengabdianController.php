@@ -15,7 +15,11 @@ class AdminPengabdianController extends Controller
                         ->orderBy('created_at', 'desc')
                         ->get();
 
-        return view('admin.pengabdian.index', compact('pengabdian'));
+        return view('admin.pengabdian.index', [
+    'title' => 'Validasi Pengabdian',
+    'pengabdian' => $pengabdian
+]);
+
     }
 
     // =========================

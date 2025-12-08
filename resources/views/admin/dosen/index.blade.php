@@ -4,6 +4,10 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h4 class="fw-bold">Data Dosen</h4>
+
+    <a href="{{ route('admin.dosen.create') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Tambah Dosen
+    </a>
 </div>
 
 {{-- SEARCH --}}
@@ -52,25 +56,37 @@
                     </td>
 
                     {{-- AKSI --}}
-                    <td class="text-center">
-                        <form action="{{ route('admin.dosen.toggle-status', $d->id) }}" method="POST" class="d-inline">
-                            @csrf
-                            @method('PUT')
+<td class="text-center">
 
-                            @if($d->is_active)
-                                <button class="btn btn-sm btn-outline-danger"
-                                    onclick="return confirm('Nonaktifkan dosen ini?')">
-                                    <i class="bi bi-x-circle"></i> Nonaktifkan
-                                </button>
-                            @else
-                                <button class="btn btn-sm btn-outline-success"
-                                    onclick="return confirm('Aktifkan kembali dosen ini?')">
-                                    <i class="bi bi-check-circle"></i> Aktifkan
-                                </button>
-                            @endif
+    {{-- ✅ TOMBOL EDIT --}}
+    <a href="{{ route('admin.dosen.edit', $d->id) }}"
+       class="btn btn-sm btn-outline-primary me-1">
+        <i class="bi bi-pencil"></i>
+    </a>
 
-                        </form>
-                    </td>
+    {{-- ✅ FORM AKTIF / NONAKTIF --}}
+    <form action="{{ route('admin.dosen.toggle-status', $d->id) }}"
+          method="POST"
+          class="d-inline toggle-form"
+          data-nama="{{ $d->nama }}"
+          data-status="{{ $d->is_active ? 'nonaktifkan' : 'aktifkan' }}">
+        @csrf
+        @method('PUT')
+
+        @if($d->is_active)
+            <button type="button" class="btn btn-sm btn-outline-danger toggle-btn">
+                <i class="bi bi-x-circle"></i>
+            </button>
+        @else
+            <button type="button" class="btn btn-sm btn-outline-success toggle-btn">
+                <i class="bi bi-check-circle"></i>
+            </button>
+        @endif
+
+    </form>
+
+</td>
+
 
                 </tr>
                 @endforeach
@@ -97,6 +113,42 @@ document.getElementById('searchInput').addEventListener('keyup', function() {
     rows.forEach(row => {
         const text = row.getAttribute('data-search');
         row.style.display = text.includes(keyword) ? '' : 'none';
+    });
+});
+</script>
+<script>
+document.querySelectorAll('.toggle-btn').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        const form = this.closest('form');
+        const nama = form.dataset.nama;
+        const status = form.dataset.status;
+
+        Swal.fire({
+            title: status === 'aktifkan' ? 'Aktifkan Dosen?' : 'Nonaktifkan Dosen?',
+            html: `Yakin ingin <b>${status}</b> dosen:<br><strong>${nama}</strong>?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: status === 'aktifkan' ? 'Ya, Aktifkan' : 'Ya, Nonaktifkan',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: status === 'aktifkan' ? '#16a34a' : '#dc2626',
+            cancelButtonColor: '#6c757d',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+
+                Swal.fire({
+                    title: 'Memproses...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                form.submit();
+            }
+        });
     });
 });
 </script>

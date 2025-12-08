@@ -17,7 +17,6 @@
             margin: 0;
         }
 
-        /* SIDEBAR */
         .sidebar {
             width: 250px;
             height: 100vh;
@@ -62,47 +61,18 @@
             color: #ffd700;
         }
 
-        /* CONTENT */
         .content {
-            margin-left: 250px; /* ✅ INI KUNCI UTAMA POSISI SAMPING */
+            margin-left: 250px;
             padding: 25px;
+            min-height: 100vh;
         }
 
-        .profile-photo {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid white;
-        }
-
-        /* TOPBAR */
         .topbar {
             background: white;
             padding: 15px 25px;
             border-radius: 10px;
             margin-bottom: 20px;
         }
-
-        /* STAT */
-        .stat {
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
-            position: relative;
-            overflow: hidden;
-            min-height: 120px;
-        }
-        .stat i {
-            font-size: 48px;
-            position: absolute;
-            right: 20px;
-            bottom: 15px;
-            opacity: 0.25;
-        }
-        .stat-green { background: #27ae60; }
-        .stat-blue { background: #2980b9; }
-        .stat-orange { background: #e67e22; }
     </style>
 </head>
 <body>
@@ -114,6 +84,7 @@
         @include('partials.sidebar')
     @endif
 
+    {{-- CONTENT AREA --}}
     <div class="content">
 
         <!-- ✅ TOPBAR OTOMATIS ADMIN / DOSEN -->
@@ -134,7 +105,7 @@
             </div>
         </div>
 
-        <!-- Content dari child view -->
+        {{-- ✅ INI YANG TADI HILANG --}}
         @yield('content')
 
     </div>
@@ -142,7 +113,7 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Sweet Alert 2 -->
+    <!-- Sweet Alert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </body>

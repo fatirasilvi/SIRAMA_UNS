@@ -71,12 +71,14 @@ public function index()
         ->take(10)
         ->values();
 
-    return view('admin.index', compact(
-        'totalPenelitian',
-        'totalPengabdian',
-        'totalDosen',
-        'menungguValidasi',
-        'aktivitas'
-    ));
+    return view('admin.index', [
+    'title' => 'Dashboard Admin',
+    'totalPenelitian' => $totalPenelitian,
+    'totalPengabdian' => $totalPengabdian,
+    'totalDosen' => $totalDosen,
+    'menungguValidasi' => $menungguValidasi,
+    'aktivitas' => $aktivitas
+]);
+
 }
 }

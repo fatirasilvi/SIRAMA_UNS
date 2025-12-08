@@ -11,7 +11,7 @@ use App\Exports\LaporanRekapExport;
 class AdminLaporanController extends Controller
 {
     // =========================
-    // INDEX LAPORAN
+    // INDEX LAPORAN (REKAP PER DOSEN)
     // =========================
     public function index(Request $request)
     {
@@ -30,43 +30,58 @@ class AdminLaporanController extends Controller
             }
         ])->get();
 
-        return view('admin.laporan.index', compact('dosen', 'tahun'));
+        return view('admin.laporan.index', [
+    'title' => 'Laporan Rekap',
+    'dosen' => $dosen
+]);
+
     }
 
     // =========================
-    // EXPORT PDF
+    // EXPORT PDF (PENELITIAN / PENGABDIAN)
     // =========================
     public function exportPdf(Request $request)
     {
         $tahun = $request->tahun;
+        $tipe  = $request->tipe; // penelitian / pengabdian
 
-        $dosen = Dosen::withCount([
-            'penelitians as total_penelitian' => function ($q) use ($tahun) {
-                if ($tahun) {
-                    $q->where('tahun', $tahun);
+        if ($tipe === 'penelitian') {
+            $dosen = Dosen::withCount([
+                'penelitians as total' => function ($q) use ($tahun) {
+                    if ($tahun) {
+                        $q->where('tahun', $tahun);
+                    }
                 }
-            },
-            'pengabdians as total_pengabdian' => function ($q) use ($tahun) {
-                if ($tahun) {
-                    $q->where('tahun', $tahun);
-                }
-            }
-        ])->get();
+            ])->get();
 
-        $pdf = Pdf::loadView('admin.laporan.pdf', compact('dosen', 'tahun'))
+            $judul = 'Laporan Rekap Penelitian';
+
+        } else {
+            $dosen = Dosen::withCount([
+                'pengabdians as total' => function ($q) use ($tahun) {
+                    if ($tahun) {
+                        $q->where('tahun', $tahun);
+                    }
+                }
+            ])->get();
+
+            $judul = 'Laporan Rekap Pengabdian';
+        }
+
+        $pdf = Pdf::loadView('admin.laporan.pdf', compact('dosen', 'tahun', 'tipe', 'judul'))
                     ->setPaper('A4', 'landscape');
 
-        return $pdf->download('laporan_rekap_dosen.pdf');
+        return $pdf->download(strtolower(str_replace(' ', '_', $judul)) . '.pdf');
     }
 
     // =========================
-    // EXPORT EXCEL
+    // EXPORT EXCEL (PENELITIAN / PENGABDIAN)
     // =========================
     public function exportExcel(Request $request)
     {
         return Excel::download(
-            new LaporanRekapExport($request->tahun),
-            'laporan_rekap_dosen.xlsx'
+            new LaporanRekapExport($request->tahun, $request->tipe),
+            'laporan_rekap_' . $request->tipe . '.xlsx'
         );
     }
 }

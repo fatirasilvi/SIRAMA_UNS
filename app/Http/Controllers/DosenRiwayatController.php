@@ -45,7 +45,12 @@ class DosenRiwayatController extends Controller
             ->orderBy('nama_bidang')
             ->get();
 
-        return view('dosen.riwayat.index', compact('riwayat', 'bidangList'));
+        return view('dosen.riwayat.index', [
+    'title' => 'Riwayat & Laporan',
+    'riwayat' => $riwayat,
+    'bidangList' => $bidangList
+]);
+
     }
 
     // ============================

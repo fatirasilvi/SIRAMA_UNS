@@ -14,7 +14,11 @@ class AdminPenelitianController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('admin.penelitian.index', compact('penelitian'));
+        return view('admin.penelitian.index', [
+    'title' => 'Validasi Penelitian',
+    'penelitian' => $penelitian
+]);
+
     }
 
     // ✅ DETAIL PENELITIAN

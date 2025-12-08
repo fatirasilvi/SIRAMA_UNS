@@ -14,25 +14,22 @@ class AdminProfilController extends Controller
         return view('admin.edit-profil', compact('admin'));
     }
 
-    public function update(Request $request)
-    {
-        $admin = Auth::guard('admin')->user();
+   public function update(Request $request)
+{
+    $admin = auth()->guard('admin')->user();
 
-        $request->validate([
-            'nama'     => 'required|string|max:255',
-            'username' => 'required|string|max:100',
-            'email'    => 'required|email',
-            'jabatan'  => 'required|string|max:100',
-        ]);
+    $request->validate([
+        'nama' => 'required|string|max:255',
+        'nip'  => 'required|string|max:50',
+    ]);
 
-        // ✅ TIDAK ADA FOTO DI SINI
+    $admin->nama = $request->nama;
+    $admin->nip  = $request->nip;
 
-        $admin->nama     = $request->nama;
-        $admin->username = $request->username;
-        $admin->email    = $request->email;
-        $admin->jabatan  = $request->jabatan;
-        $admin->save();
+    $admin->save();
 
-        return back()->with('success', 'Profil admin berhasil diperbarui.');
-    }
+    return back()->with('success', 'Profil admin berhasil diperbarui.');
+}
+
+
 }

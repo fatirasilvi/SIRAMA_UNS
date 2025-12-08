@@ -17,41 +17,27 @@
             @csrf
             @method('PUT')
 
-            <div class="row">
-
-                <div class="col-md-8 mx-auto">
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Nama Lengkap</label>
-                        <input type="text" name="nama" class="form-control"
-                              value="{{ $admin->nama }}" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Username</label>
-                        <input type="text" name="username" class="form-control"
-                              value="{{ $admin->username }}" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Email</label>
-                        <input type="email" name="email" class="form-control"
-                              value="{{ $admin->email }}" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-bold">Jabatan</label>
-                        <input type="text" name="jabatan" class="form-control"
-                              value="{{ $admin->jabatan }}">
-                    </div>
-
-                    <button type="submit" class="btn btn-primary px-4">
-                        Simpan Perubahan
-                    </button>
-
-                </div>
-
+            <div class="mb-3">
+                <label class="form-label fw-bold">Nama</label>
+                <input type="text" 
+                       name="nama" 
+                       class="form-control" 
+                       value="{{ auth()->guard('admin')->user()->nama }}" 
+                       required>
             </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">NIP</label>
+                <input type="text" 
+                       name="nip" 
+                       class="form-control" 
+                       value="{{ auth()->guard('admin')->user()->nip }}" 
+                       required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Simpan Perubahan
+            </button>
         </form>
 
     </div>
