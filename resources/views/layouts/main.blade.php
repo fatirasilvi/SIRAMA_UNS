@@ -75,6 +75,7 @@
         }
     </style>
 </head>
+
 <body>
 
     {{-- SIDEBAR --}}
@@ -115,6 +116,49 @@
 
     <!-- Sweet Alert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Sweet Alert 2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+<!-- Script untuk notifikasi -->
+<script>
+    // Success notification
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Berhasil!',
+            text: '{{ session('success') }}',
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+        });
+    @endif
+
+    // Error notification
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Gagal!',
+            text: '{{ session('error') }}',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#d33'
+        });
+    @endif
+
+    // Validation errors
+    @if($errors->any())
+        Swal.fire({
+            icon: 'error',
+            title: 'Terjadi Kesalahan!',
+            html: '<ul style="text-align: left;">' +
+                @foreach($errors->all() as $error)
+                    '<li>{{ $error }}</li>' +
+                @endforeach
+                '</ul>',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#d33'
+        });
+    @endif
+</script>
 </body>
 </html>
+

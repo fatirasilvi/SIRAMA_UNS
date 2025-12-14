@@ -2,50 +2,38 @@
 
 namespace App\Exports;
 
-use App\Models\Dosen;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 
-class LaporanRekapExport implements FromView
+class LaporanRekapExport implements FromView, WithTitle, ShouldAutoSize
 {
+    protected $rows;
     protected $tahun;
-    protected $tipe; // penelitian / pengabdian
+    protected $mode;
+    protected $judul;
 
-    // ✅ INI YANG BARUSAN KITA BAHAS
-    public function __construct($tahun, $tipe)
+    public function __construct($rows, $tahun, $mode, $judul)
     {
+        $this->rows = $rows;
         $this->tahun = $tahun;
-        $this->tipe  = $tipe;
+        $this->mode = $mode;
+        $this->judul = $judul;
     }
 
-    // ✅ INI TEMPAT IF ($this->tipe === 'penelitian') KAMU TARUH
     public function view(): View
     {
-        if ($this->tipe === 'penelitian') {
+        return view('admin.laporan.excel', [
+            'rows' => $this->rows,
+            'tahun' => $this->tahun,
+            'mode' => $this->mode,
+            'judul' => $this->judul,
+        ]);
+    }
 
-            $dosen = Dosen::withCount([
-                'penelitians as total' => function ($q) {
-                    if ($this->tahun) {
-                        $q->where('tahun', $this->tahun);
-                    }
-                }
-            ])->get();
-
-            $judul = 'Laporan Rekap Penelitian';
-
-        } else {
-
-            $dosen = Dosen::withCount([
-                'pengabdians as total' => function ($q) {
-                    if ($this->tahun) {
-                        $q->where('tahun', $this->tahun);
-                    }
-                }
-            ])->get();
-
-            $judul = 'Laporan Rekap Pengabdian';
-        }
-
-        return view('admin.laporan.excel', compact('dosen', 'judul'));
+    public function title(): string
+    {
+        return 'Laporan Rekap';
     }
 }

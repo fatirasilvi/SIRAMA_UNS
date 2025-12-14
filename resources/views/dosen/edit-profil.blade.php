@@ -51,10 +51,17 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Program Studi</label>
-                        <input type="text" name="prodi" class="form-control" 
-                               value="{{ $dosen->prodi }}">
-                    </div>
+    <label class="form-label fw-bold">Program Studi</label>
+    <select name="prodi_id" class="form-select">
+        <option value="">-- Pilih Prodi --</option>
+        @foreach($prodiList as $p)
+            <option value="{{ $p->id }}" {{ $dosen->prodi_id == $p->id ? 'selected' : '' }}>
+                {{ $p->nama }}
+            </option>
+        @endforeach
+    </select>
+</div>
+
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Jabatan</label>

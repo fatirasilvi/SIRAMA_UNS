@@ -56,6 +56,33 @@
                 @enderror
             </div>
 
+            {{-- RESEARCH GROUP --}}
+            <div class="mb-3">
+                <label class="form-label">
+                    Research Group (Tim Pengabdian)
+                    <span class="text-muted">(Opsional)</span>
+                </label>
+                <select name="research_group_id" 
+                        class="form-select @error('research_group_id') is-invalid @enderror">
+                    <option value="">-- Pilih Research Group (Jika Ada) --</option>
+                    @foreach($researchGroups as $group)
+                        <option value="{{ $group->id }}" {{ old('research_group_id') == $group->id ? 'selected' : '' }}>
+                            {{ $group->nama_group }}
+                            @if($group->ketua)
+                                (Ketua: {{ $group->ketua }})
+                            @endif
+                        </option>
+                    @endforeach
+                </select>
+                <small class="text-muted d-block mt-1">
+                    <i class="bi bi-info-circle"></i> 
+                    Pilih research group jika pengabdian ini merupakan bagian dari tim tertentu
+                </small>
+                @error('research_group_id')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
             {{-- TAHUN --}}
             <div class="mb-3">
                 <label class="form-label">Tahun <span class="text-danger">*</span></label>

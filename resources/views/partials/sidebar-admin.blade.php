@@ -20,6 +20,14 @@
         <i class="bi bi-people"></i> Data Dosen
     </a>
 
+    <a href="{{ route('admin.prodi.index') }}" class="{{ request()->is('admin/prodi*') ? 'active' : '' }}">
+        <i class="bi bi-mortarboard"></i> Data Prodi
+    </a>
+
+    <a href="{{ route('admin.research-group.index') }}" class="{{ request()->is('admin/research-group*') ? 'active' : '' }}">
+        <i class="bi bi-diagram-3"></i> Research Group
+    </a>
+
     <a href="{{ route('admin.penelitian.index') }}" class="{{ request()->is('admin/penelitian*') ? 'active' : '' }}">
         <i class="bi bi-journal-check"></i> Validasi Penelitian
     </a>
@@ -33,7 +41,6 @@
     </a>
 
     <div class="sidebar-divider"></div>
-
 
     <form action="{{ route('admin.logout') }}" method="POST" class="mt-2">
         @csrf

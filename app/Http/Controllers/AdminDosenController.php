@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dosen;
+use App\Models\Prodi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -26,7 +27,12 @@ class AdminDosenController extends Controller
     // ===============================
     public function create()
     {
-        return view('admin.dosen.create');
+        $prodis = Prodi::orderBy('nama')->get();
+
+        return view('admin.dosen.create', [
+            'title'  => 'Tambah Dosen',
+            'prodis' => $prodis
+        ]);
     }
 
     // ===============================
@@ -60,8 +66,14 @@ class AdminDosenController extends Controller
     // ===============================
     public function edit($id)
     {
-        $dosen = Dosen::findOrFail($id);
-        return view('admin.dosen.edit', compact('dosen'));
+        $dosen  = Dosen::findOrFail($id);
+    $prodis = Prodi::orderBy('nama')->get();
+
+    return view('admin.dosen.edit', [
+        'title'  => 'Edit Dosen',
+        'dosen'  => $dosen,
+        'prodis' => $prodis,
+    ]);
     }
 
     // ===============================
@@ -71,22 +83,23 @@ class AdminDosenController extends Controller
     {
         $dosen = Dosen::findOrFail($id);
 
-        $request->validate([
-            'nama'   => 'required',
-            'nip'    => 'required|unique:dosen,nip,' . $id,
-            'email'  => 'required|email|unique:dosen,email,' . $id,
-        ]);
+    $request->validate([
+        'nama' => 'required|string|max:255',
+        'nip'  => 'required|string|max:50|unique:dosen,nip,' . $dosen->id,
+        'email' => 'nullable|email',
+        'prodi' => 'nullable|string|max:255',
+        'jabatan' => 'nullable|string|max:255',
+    ]);
 
-        $dosen->update([
-            'nama'    => $request->nama,
-            'nip'     => $request->nip,
-            'email'   => $request->email,
-            'prodi'   => $request->prodi,
-            'jabatan' => $request->jabatan,
-        ]);
+    $dosen->nama = $request->nama;
+    $dosen->nip  = $request->nip;
+    $dosen->email = $request->email;
+    $dosen->prodi = $request->prodi;     // ✅ dari dropdown
+    $dosen->jabatan = $request->jabatan;
 
-        return redirect()->route('admin.dosen.index')
-            ->with('success', 'Data dosen berhasil diperbarui');
+    $dosen->save();
+
+    return redirect()->route('admin.dosen.index')->with('success', 'Data dosen berhasil diperbarui.');
     }
 
     // ===============================

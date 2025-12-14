@@ -8,13 +8,14 @@ class Pengabdian extends Model
 {
     protected $fillable = [
         'dosen_id',
-        'judul',
-        'bidang',      
-        'bidang_id',   
-        'tahun',
-        'abstrak',
-        'file_path',
-        'status',
+    'judul',
+    'bidang',
+    'bidang_id',
+    'research_group_id',
+    'tahun',
+    'abstrak',
+    'file_path',
+    'status',
     ];
 
     // Relasi ke dosen
@@ -38,4 +39,9 @@ class Pengabdian extends Model
 
         return $this->attributes['bidang'] ?? '-';
     }
+
+    public function researchGroup()
+{
+    return $this->belongsTo(ResearchGroup::class, 'research_group_id');
+}
 }

@@ -12,7 +12,7 @@
         <div class="row g-3">
 
             {{-- FILTER TAHUN --}}
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label class="fw-semibold mb-1">Tahun</label>
                 <select class="form-select" id="filterTahun">
                     <option value="">Semua Tahun</option>
@@ -22,8 +22,19 @@
                 </select>
             </div>
 
-            {{-- FILTER STATUS --}}
+            {{-- FILTER RESEARCH GROUP --}}
             <div class="col-md-3">
+                <label class="fw-semibold mb-1">Research Group</label>
+                <select class="form-select" id="filterGroup">
+                    <option value="">Semua Group</option>
+                    @foreach(App\Models\ResearchGroup::where('is_active', true)->orderBy('nama_group')->get() as $rg)
+                        <option value="{{ $rg->nama_group }}">{{ $rg->nama_group }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            {{-- FILTER STATUS --}}
+            <div class="col-md-2">
                 <label class="fw-semibold mb-1">Status</label>
                 <select class="form-select" id="filterStatus">
                     <option value="">Semua Status</option>
@@ -34,7 +45,7 @@
             </div>
 
             {{-- SEARCH --}}
-            <div class="col-md-6">
+            <div class="col-md-5">
                 <label class="fw-semibold mb-1">Pencarian</label>
                 <input type="text" class="form-control" id="searchInput"
                        placeholder="Cari judul atau nama dosen...">
@@ -54,13 +65,14 @@
 
             <thead>
                 <tr class="text-secondary">
-                    <th width="5%">No</th>
-                    <th width="35%">Judul</th>
-                    <th width="20%">Dosen</th>
+                    <th width="3%">No</th>
+                    <th width="30%">Judul</th>
+                    <th width="15%">Dosen</th>
+                    <th width="12%">Research Group</th>
                     <th width="10%">Bidang</th>
-                    <th width="10%">Tahun</th>
+                    <th width="7%">Tahun</th>
                     <th width="10%">Status</th>
-                    <th class="text-center" width="10%">Aksi</th>
+                    <th class="text-center" width="13%">Aksi</th>
                 </tr>
             </thead>
 
@@ -69,18 +81,29 @@
                 <tr
                     data-judul="{{ strtolower($p->judul) }}"
                     data-dosen="{{ strtolower($p->dosen->nama) }}"
+                    data-group="{{ $p->researchGroup ? strtolower($p->researchGroup->nama_group) : '' }}"
                     data-tahun="{{ $p->tahun }}"
                     data-status="{{ $p->status }}"
                 >
                     <td>{{ $i+1 }}</td>
 
-                    {{-- ✅ JUDUL DIPOTONG --}}
                     <td title="{{ $p->judul }}">
-                        {{ \Illuminate\Support\Str::limit($p->judul, 60, '...') }}
+                        {{ \Illuminate\Support\Str::limit($p->judul, 50, '...') }}
                     </td>
 
                     <td>{{ $p->dosen->nama }}</td>
-                    <td>{{ $p->bidang }}</td>
+
+                    <td>
+                        @if($p->researchGroup)
+                            <span class="badge bg-info text-dark">
+                                {{ $p->researchGroup->nama_group }}
+                            </span>
+                        @else
+                            <span class="text-muted">-</span>
+                        @endif
+                    </td>
+
+                    <td>{{ $p->bidangRelation->nama_bidang ?? $p->bidang ?? '-' }}</td>
                     <td>{{ $p->tahun }}</td>
 
                     <td>
@@ -106,22 +129,24 @@
 
                         {{-- APPROVE --}}
                         <form action="{{ route('admin.pengabdian.approve', $p->id) }}"
-                              method="POST" class="d-inline">
+                              method="POST" class="d-inline approve-form">
                             @csrf
                             @method('PUT')
-                            <button class="btn btn-sm btn-outline-success"
-                              onclick="return confirm('Setujui pengabdian ini?')">
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-success approve-button"
+                                    data-judul="{{ $p->judul }}">
                                 <i class="bi bi-check-circle"></i>
                             </button>
                         </form>
 
                         {{-- REJECT --}}
                         <form action="{{ route('admin.pengabdian.reject', $p->id) }}"
-                              method="POST" class="d-inline">
+                              method="POST" class="d-inline reject-form">
                             @csrf
                             @method('PUT')
-                            <button class="btn btn-sm btn-outline-danger"
-                              onclick="return confirm('Tolak pengabdian ini?')">
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-danger reject-button"
+                                    data-judul="{{ $p->judul }}">
                                 <i class="bi bi-x-circle"></i>
                             </button>
                         </form>
@@ -149,10 +174,71 @@
 </div>
 
 
-{{-- ✅ SCRIPT FILTER --}}
 <script>
+// Sweet Alert Approve
+document.querySelectorAll('.approve-button').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const form = this.closest('form');
+        const judul = this.getAttribute('data-judul');
+        
+        Swal.fire({
+            title: 'Setujui Pengabdian?',
+            html: `Apakah Anda yakin ingin menyetujui:<br><strong>"${judul}"</strong>?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="bi bi-check-circle"></i> Ya, Setujui!',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Memproses...',
+                    allowOutsideClick: false,
+                    didOpen: () => { Swal.showLoading(); }
+                });
+                form.submit();
+            }
+        });
+    });
+});
+
+// Sweet Alert Reject
+document.querySelectorAll('.reject-button').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const form = this.closest('form');
+        const judul = this.getAttribute('data-judul');
+        
+        Swal.fire({
+            title: 'Tolak Pengabdian?',
+            html: `Apakah Anda yakin ingin menolak:<br><strong>"${judul}"</strong>?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="bi bi-x-circle"></i> Ya, Tolak!',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Memproses...',
+                    allowOutsideClick: false,
+                    didOpen: () => { Swal.showLoading(); }
+                });
+                form.submit();
+            }
+        });
+    });
+});
+
+// Filter
 const searchInput  = document.getElementById('searchInput');
 const filterTahun  = document.getElementById('filterTahun');
+const filterGroup  = document.getElementById('filterGroup');
 const filterStatus = document.getElementById('filterStatus');
 const tableBody    = document.getElementById('tableBody');
 const noResults    = document.getElementById('noResults');
@@ -160,6 +246,7 @@ const noResults    = document.getElementById('noResults');
 function filterTable() {
     const search = searchInput.value.toLowerCase();
     const tahun  = filterTahun.value;
+    const group  = filterGroup.value.toLowerCase();
     const status = filterStatus.value;
 
     let visible = 0;
@@ -167,14 +254,16 @@ function filterTable() {
     document.querySelectorAll('#tableBody tr').forEach(row => {
         const judul  = row.dataset.judul;
         const dosen  = row.dataset.dosen;
+        const rGroup = row.dataset.group;
         const rTahun = row.dataset.tahun;
         const rStat  = row.dataset.status;
 
         const matchSearch = judul.includes(search) || dosen.includes(search);
         const matchTahun  = !tahun || rTahun === tahun;
+        const matchGroup  = !group || rGroup.includes(group);
         const matchStatus = !status || rStat === status;
 
-        if (matchSearch && matchTahun && matchStatus) {
+        if (matchSearch && matchTahun && matchGroup && matchStatus) {
             row.style.display = '';
             visible++;
         } else {
@@ -193,6 +282,7 @@ function filterTable() {
 
 searchInput.addEventListener('keyup', filterTable);
 filterTahun.addEventListener('change', filterTable);
+filterGroup.addEventListener('change', filterTable);
 filterStatus.addEventListener('change', filterTable);
 </script>
 

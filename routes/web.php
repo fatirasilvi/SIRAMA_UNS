@@ -13,7 +13,8 @@ use App\Http\Controllers\AdminPenelitianController;
 use App\Http\Controllers\AdminPengabdianController;
 use App\Http\Controllers\AdminLaporanController;
 use App\Http\Controllers\AdminProfilController;
-
+use App\Http\Controllers\AdminResearchGroupController;
+use App\Http\Controllers\AdminProdiController;
 /*
 |--------------------------------------------------------------------------
 | PUBLIC ROUTES (DOSEN AUTH)
@@ -119,14 +120,12 @@ Route::prefix('dosen')->middleware('auth:dosen')->name('dosen.')->group(function
     Route::delete('/pengabdian/{id}', [DosenPengabdianController::class, 'destroy'])
         ->name('pengabdian.destroy');
 
-    Route::get('/riwayat', [DosenRiwayatController::class, 'index'])
+     Route::get('/riwayat', [DosenRiwayatController::class, 'index'])
         ->name('riwayat.index');
-
-    Route::get('/riwayat/export', [DosenRiwayatController::class, 'export'])
-        ->name('riwayat.export');
-    
-    Route::get('/riwayat/pdf', [DosenRiwayatController::class, 'exportPdf'])
-    ->name('riwayat.pdf');
+    Route::get('/riwayat/export-pdf', [DosenRiwayatController::class, 'exportPdf'])
+        ->name('riwayat.export.pdf');
+    Route::get('/riwayat/export-excel', [DosenRiwayatController::class, 'exportExcel'])
+        ->name('riwayat.export.excel');
 });
 
 use App\Http\Controllers\AdminDashboardController;
@@ -214,7 +213,26 @@ Route::get('/laporan/export-excel', [AdminLaporanController::class, 'exportExcel
     // ✅ LOGOUT ADMIN
     Route::post('/logout', [AuthAdminController::class, 'logout'])
         ->name('logout');
-    
+    // Research Group Management
+    Route::get('/research-group', [AdminResearchGroupController::class, 'index'])
+        ->name('research-group.index');
+    Route::get('/research-group/create', [AdminResearchGroupController::class, 'create'])
+        ->name('research-group.create');
+    Route::post('/research-group', [AdminResearchGroupController::class, 'store'])
+        ->name('research-group.store');
+    Route::get('/research-group/{id}/edit', [AdminResearchGroupController::class, 'edit'])
+        ->name('research-group.edit');
+    Route::put('/research-group/{id}', [AdminResearchGroupController::class, 'update'])
+        ->name('research-group.update');
+    Route::delete('/research-group/{id}', [AdminResearchGroupController::class, 'destroy'])
+        ->name('research-group.destroy');
 
+        // Prodi Management
+        Route::get('/prodi', [AdminProdiController::class, 'index'])->name('prodi.index');
+Route::get('/prodi/create', [AdminProdiController::class, 'create'])->name('prodi.create');
+Route::post('/prodi', [AdminProdiController::class, 'store'])->name('prodi.store');
+Route::get('/prodi/{id}/edit', [AdminProdiController::class, 'edit'])->name('prodi.edit');
+Route::put('/prodi/{id}', [AdminProdiController::class, 'update'])->name('prodi.update');
+Route::delete('/prodi/{id}', [AdminProdiController::class, 'destroy'])->name('prodi.destroy');
 });
 

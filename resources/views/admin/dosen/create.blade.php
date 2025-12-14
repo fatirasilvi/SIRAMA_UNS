@@ -30,9 +30,16 @@
             </div>
 
             <div class="mb-3">
-                <label>Prodi</label>
-                <input type="text" name="prodi" class="form-control">
-            </div>
+    <label>Prodi</label>
+    <select name="prodi" class="form-select">
+        <option value="">-- Pilih Prodi --</option>
+        @foreach($prodis as $p)
+            <option value="{{ $p->nama }}">{{ $p->nama }}</option>
+        @endforeach
+    </select>
+    <small class="text-muted">Data prodi diambil dari menu Admin → Prodi.</small>
+</div>
+
 
             <div class="mb-3">
                 <label>Jabatan</label>

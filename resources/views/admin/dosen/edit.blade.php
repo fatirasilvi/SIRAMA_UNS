@@ -28,10 +28,19 @@
                        value="{{ $dosen->email }}">
             </div>
 
+            {{-- ✅ PRODI DROPDOWN --}}
             <div class="mb-3">
                 <label>Prodi</label>
-                <input type="text" name="prodi" class="form-control"
-                       value="{{ $dosen->prodi }}">
+                <select name="prodi" class="form-select">
+                    <option value="">- Pilih Prodi -</option>
+                    @foreach($prodis as $p)
+                        <option value="{{ $p->nama }}"
+                            {{ ($dosen->prodi === $p->nama) ? 'selected' : '' }}>
+                            {{ $p->nama }}
+                        </option>
+                    @endforeach
+                </select>
+                <small class="text-muted">Data prodi diambil dari menu Prodi.</small>
             </div>
 
             <div class="mb-3">
@@ -41,8 +50,8 @@
             </div>
 
             <button type="submit" class="btn btn-primary px-4" id="btnUpdate">
-    <i class="bi bi-save"></i> Update
-</button>
+                <i class="bi bi-save"></i> Update
+            </button>
 
             <a href="{{ route('admin.dosen.index') }}" class="btn btn-secondary">Kembali</a>
         </form>
@@ -55,6 +64,7 @@ document.getElementById('btnUpdate').addEventListener('click', function(e) {
 
     Swal.fire({
         title: 'Simpan Perubahan?',
+        text: 'Perubahan data dosen akan diperbarui.',
         icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'Ya, Simpan',
@@ -62,18 +72,15 @@ document.getElementById('btnUpdate').addEventListener('click', function(e) {
         confirmButtonColor: '#16a34a'
     }).then((result) => {
         if (result.isConfirmed) {
-
             Swal.fire({
                 title: 'Menyimpan...',
                 allowOutsideClick: false,
                 didOpen: () => Swal.showLoading()
             });
-
             this.closest('form').submit();
         }
     });
 });
 </script>
-
 
 @endsection

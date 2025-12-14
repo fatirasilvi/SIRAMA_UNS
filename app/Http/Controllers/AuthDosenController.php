@@ -60,7 +60,7 @@ class AuthDosenController extends Controller
 
         $request->session()->regenerate();
 
-        // ✅ CEK STATUS AKTIF DOSEN DI SINI (INI YANG KAMU TANYAKAN!)
+        // CEK STATUS AKTIF DOSEN DI SINI (INI YANG KAMU TANYAKAN!)
         $dosen = Auth::guard('dosen')->user();
 
         if (!$dosen->is_active) {
@@ -71,7 +71,7 @@ class AuthDosenController extends Controller
         return redirect()->route('dosen.dashboard');
     }
 
-    // ✅ COBA LOGIN SEBAGAI ADMIN
+    // COBA LOGIN SEBAGAI ADMIN
     if (Auth::guard('admin')->attempt([
         'nip' => $request->nip,
         'password' => $request->password,
@@ -81,7 +81,7 @@ class AuthDosenController extends Controller
         return redirect()->route('admin.dashboard');
     }
 
-    // ❌ JIKA GAGAL SEMUA
+    // JIKA GAGAL SEMUA
     return back()->withErrors([
         'nip' => 'NIP atau Password salah',
     ]);

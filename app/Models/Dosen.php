@@ -14,7 +14,7 @@ class Dosen extends Authenticatable
         'email',
         'password',
         'foto',
-        'prodi',
+        'prodi_id',
         'jabatan',
     ];
 
@@ -31,4 +31,16 @@ class Dosen extends Authenticatable
 {
     return $this->hasMany(Pengabdian::class);
 }
+
+public function prodi()
+{
+    return $this->belongsTo(\App\Models\Prodi::class, 'prodi_id');
+}
+
+public function researchGroup()
+{
+    return $this->belongsTo(\App\Models\ResearchGroup::class, 'research_group_id');
+}
+
+
 }

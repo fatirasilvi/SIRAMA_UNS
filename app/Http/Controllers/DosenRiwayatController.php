@@ -7,8 +7,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Penelitian;
 use App\Models\Pengabdian;
 use App\Models\Bidang;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\DosenRiwayatExport;
 
 class DosenRiwayatController extends Controller
 {
@@ -20,20 +21,24 @@ class DosenRiwayatController extends Controller
         $dosen = Auth::guard('dosen')->user();
 
         // Ambil penelitian yang disetujui
-        $penelitian = Penelitian::where('dosen_id', $dosen->id)
+        $penelitian = Penelitian::with('bidangRelation')
+            ->where('dosen_id', $dosen->id)
             ->where('status', 'Disetujui')
             ->get()
             ->map(function ($item) {
                 $item->tipe = 'penelitian';
+                $item->bidang = $item->bidangRelation->nama_bidang ?? $item->bidang ?? '-';
                 return $item;
             });
 
         // Ambil pengabdian yang disetujui
-        $pengabdian = Pengabdian::where('dosen_id', $dosen->id)
+        $pengabdian = Pengabdian::with('bidangRelation')
+            ->where('dosen_id', $dosen->id)
             ->where('status', 'Disetujui')
             ->get()
             ->map(function ($item) {
                 $item->tipe = 'pengabdian';
+                $item->bidang = $item->bidangRelation->nama_bidang ?? $item->bidang ?? '-';
                 return $item;
             });
 
@@ -46,101 +51,85 @@ class DosenRiwayatController extends Controller
             ->get();
 
         return view('dosen.riwayat.index', [
-    'title' => 'Riwayat & Laporan',
-    'riwayat' => $riwayat,
-    'bidangList' => $bidangList
-]);
-
+            'title' => 'Riwayat & Laporan',
+            'riwayat' => $riwayat,
+            'bidangList' => $bidangList
+        ]);
     }
 
     // ============================
-    // EXPORT LAPORAN (CSV)
+    // EXPORT PDF
     // ============================
-    public function export()
+    public function exportPdf()
     {
         $dosen = Auth::guard('dosen')->user();
 
-        $penelitian = Penelitian::where('dosen_id', $dosen->id)
+        $penelitian = Penelitian::with('bidangRelation')
+            ->where('dosen_id', $dosen->id)
             ->where('status', 'Disetujui')
             ->get()
             ->map(function ($item) {
                 $item->tipe = 'Penelitian';
+                $item->bidang_nama = $item->bidangRelation->nama_bidang ?? $item->bidang ?? '-';
                 return $item;
             });
 
-        $pengabdian = Pengabdian::where('dosen_id', $dosen->id)
+        $pengabdian = Pengabdian::with(['bidangRelation', 'researchGroup'])
+            ->where('dosen_id', $dosen->id)
             ->where('status', 'Disetujui')
             ->get()
             ->map(function ($item) {
                 $item->tipe = 'Pengabdian';
+                $item->bidang_nama = $item->bidangRelation->nama_bidang ?? $item->bidang ?? '-';
+                $item->research_group_nama = $item->researchGroup->nama_group ?? '-';
                 return $item;
             });
 
         $riwayat = $penelitian->merge($pengabdian)->sortByDesc('tahun');
 
-        $response = new StreamedResponse(function () use ($riwayat) {
-            $handle = fopen('php://output', 'w');
+        $pdf = Pdf::loadView('dosen.riwayat.pdf', [
+            'riwayat' => $riwayat,
+            'dosen'   => $dosen,
+            'tanggal' => date('d F Y')
+        ])->setPaper('A4', 'portrait');
 
-            // Header CSV
-            fputcsv($handle, [
-                'No',
-                'Judul',
-                'Bidang',
-                'Tahun',
-                'Status',
-                'Jenis'
-            ]);
-
-            $no = 1;
-            foreach ($riwayat as $item) {
-                fputcsv($handle, [
-                    $no++,
-                    $item->judul,
-                    $item->bidang,
-                    $item->tahun,
-                    $item->status,
-                    $item->tipe,
-                ]);
-            }
-
-            fclose($handle);
-        });
-
-        $filename = 'Riwayat_Penelitian_dan_Pengabdian_' . date('Y-m-d') . '.csv';
-
-        $response->headers->set('Content-Type', 'text/csv');
-        $response->headers->set('Content-Disposition', "attachment; filename=\"$filename\"");
-
-        return $response;
+        return $pdf->download('Laporan_Riwayat_' . $dosen->nama . '_' . date('Y-m-d') . '.pdf');
     }
 
-    public function exportPdf()
+    // ============================
+    // EXPORT EXCEL
+    // ============================
+    public function exportExcel()
 {
-    $dosen = Auth::guard('dosen')->user();
+    $dosen = Auth::guard('dosen')->user()->load('prodi'); // ✅ tambah ini
 
-    $penelitian = Penelitian::where('dosen_id', $dosen->id)
+    $penelitian = Penelitian::with('bidangRelation')
+        ->where('dosen_id', $dosen->id)
         ->where('status', 'Disetujui')
         ->get()
         ->map(function ($item) {
             $item->tipe = 'Penelitian';
+            $item->bidang_nama = $item->bidangRelation->nama_bidang ?? $item->bidang ?? '-';
             return $item;
         });
 
-    $pengabdian = Pengabdian::where('dosen_id', $dosen->id)
+    $pengabdian = Pengabdian::with(['bidangRelation', 'researchGroup'])
+        ->where('dosen_id', $dosen->id)
         ->where('status', 'Disetujui')
         ->get()
         ->map(function ($item) {
             $item->tipe = 'Pengabdian';
+            $item->bidang_nama = $item->bidangRelation->nama_bidang ?? $item->bidang ?? '-';
+            $item->research_group_nama = $item->researchGroup->nama_group ?? '-';
             return $item;
         });
 
     $riwayat = $penelitian->merge($pengabdian)->sortByDesc('tahun');
 
-    $pdf = Pdf::loadView('dosen.riwayat.pdf', [
-        'riwayat' => $riwayat,
-        'dosen'   => $dosen
-    ])->setPaper('A4', 'portrait');
-
-    return $pdf->download('Laporan_Riwayat_Penelitian_Pengabdian.pdf');
+    return Excel::download(
+        new DosenRiwayatExport($riwayat, $dosen),
+        'Laporan_Riwayat_' . $dosen->nama . '_' . date('Y-m-d') . '.xlsx'
+    );
 }
+
 }
