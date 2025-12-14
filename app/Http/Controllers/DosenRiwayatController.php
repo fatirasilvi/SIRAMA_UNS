@@ -10,6 +10,7 @@ use App\Models\Bidang;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\DosenRiwayatExport;
+use App\Models\Dosen;
 
 class DosenRiwayatController extends Controller
 {
@@ -62,7 +63,7 @@ class DosenRiwayatController extends Controller
     // ============================
     public function exportPdf()
     {
-        $dosen = Auth::guard('dosen')->user();
+        $dosen = Dosen::with('prodi')->findOrFail(Auth::guard('dosen')->id());
 
         $penelitian = Penelitian::with('bidangRelation')
             ->where('dosen_id', $dosen->id)
@@ -101,8 +102,9 @@ class DosenRiwayatController extends Controller
     // ============================
     public function exportExcel()
 {
-    $dosen = Auth::guard('dosen')->user()->load('prodi'); // ✅ tambah ini
+    $dosen = Dosen::with('prodi')->findOrFail(Auth::guard('dosen')->id()); // ✅ tambah ini
 
+     \libxml_use_internal_errors(true);
     $penelitian = Penelitian::with('bidangRelation')
         ->where('dosen_id', $dosen->id)
         ->where('status', 'Disetujui')

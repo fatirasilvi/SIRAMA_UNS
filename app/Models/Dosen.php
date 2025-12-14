@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Models\Penelitian;
+use App\Models\Pengabdian;
+use App\Models\Prodi;
 
 class Dosen extends Authenticatable
 {
