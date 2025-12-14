@@ -88,17 +88,21 @@ class DosenPengabdianController extends Controller
                     ->withErrors(['file' => 'Gagal menyimpan file: ' . $e->getMessage()]);
             }
         }
+        
+        $bidangNama = \App\Models\Bidang::where('id', $request->bidang_id)->value('nama_bidang') ?? '-';
 
         Pengabdian::create([
-            'dosen_id'          => $dosen->id,
-            'judul'             => $request->judul,
-            'bidang_id'         => $request->bidang_id,
-            'research_group_id' => $request->research_group_id,
-            'tahun'             => $request->tahun,
-            'status'            => 'Menunggu Validasi',
-            'abstrak'           => $request->abstrak,
-            'file_path'         => $filePath,
-        ]);
+    'dosen_id'          => $dosen->id,
+    'judul'             => $request->judul,
+    'bidang_id'         => $request->bidang_id,
+    'bidang'            => $bidangNama, // ✅ penting biar NOT NULL aman
+    'research_group_id' => $request->research_group_id,
+    'tahun'             => $request->tahun,
+    'status'            => 'Menunggu Validasi',
+    'abstrak'           => $request->abstrak,
+    'file_path'         => $filePath,
+]);
+
 
         return redirect()->route('dosen.pengabdian.index')
             ->with('success', 'Pengabdian berhasil ditambahkan!');
