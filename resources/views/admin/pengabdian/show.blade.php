@@ -30,6 +30,12 @@
         </div>
 
         <div class="mb-3">
+    <label class="fw-semibold">Research Group</label>
+    <p>{{ optional($data->researchGroup)->nama_group ?? '-' }}</p>
+</div>
+
+
+        <div class="mb-3">
             <label class="fw-semibold">Status</label>
             <p>
                 @if($data->status == 'Menunggu Validasi')
